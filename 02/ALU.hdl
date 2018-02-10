@@ -42,19 +42,23 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-    Not16(in=x, out=negatedx);
-    Not16(in=y, out=negatedy);
-    Mux4Way16(a=x, b=false, c=negatedx, d=true, sel[0]=zx, sel[1]=nx, out=finalx);
-    Mux4Way16(a=y, b=false, c=negatedy, d=true, sel[0]=zy, sel[1]=ny, out=finaly);
-    Add16(a=finalx, b=finaly, out=added);
-    And16(a=finalx, b=finaly, out=anded);
-    Mux16(a=anded, b=added, sel=f, out=result);
-    Not16(in=result, out=negated);
-    Mux16(a=result, b=negated, sel=no, out=out, out[0..7]=out7, out[8..15]=out15, out[15]=negative);
-    Or8Way(in=out7, out=any7);
-    Or8Way(in=out15, out=any15);
-    Or(a=any7, b=any15, out=any);
-    Xor(a=any, b=true, out=zr);
-    And(a=negative, b=true, out=ng);
+    Mux16(a=x, b=false, sel=zx, out=xmux);
+    Not16(in=xmux, out=notxmux);
+    Mux16(a=xmux, b=notxmux, sel=nx, out=drugixmux);
+    Mux16(a=y, b=false, sel=zy, out=ymux);
+    Not16(in=ymux, out=notymux);
+    Mux16(a=ymux, b=notymux, sel=ny, out=drugiymux);
+    And16(a=drugixmux, b=drugiymux, out=andzaxiymux);
+    Add16(a=drugixmux, b=drugiymux, out=addzaxiymux);
+    Mux16(a=andzaxiymux, b=addzaxiymux, sel=f, out=spojmuxeva);
+    Not16(in=spojmuxeva, out=notspojmuxeva);
+    Mux16(a=spojmuxeva, b=notspojmuxeva, sel=no, out[15]=s, out[0..14]=t);
+    Mux16(a=spojmuxeva, b=notspojmuxeva, sel=no, out[0..7]=aa, out[8..15]=bb);
+    Or8Way(in=aa, out=xx);
+    Or8Way(in=bb, out=zz);
+    Or(a=xx, b=zz, out=yy);
+    Not(in=yy, out=zr);
+    Mux16(a=spojmuxeva, b=notspojmuxeva, sel=no, out=out);
+    Mux(a=false, b=true, sel=s, out=ng);
 
 }
